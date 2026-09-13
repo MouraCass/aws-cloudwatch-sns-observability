@@ -39,5 +39,13 @@ Violação de Limiar: Gráfico do CloudWatch registrando pico de 88% de CPU romp
 Entrega de Incidente: Notificação oficial recebida via e-mail com metadados detalhados de diagnóstico.
 
 [Cassiano Alarmes e Notificacoes AWS CW.pdf](https://github.com/user-attachments/files/32162857/Cassiano.Alarmes.e.Notificacoes.AWS.CW.pdf)
+## 📑 Apresentação do Projeto
+
+![Slide 1](docs/slide1.png)
+![Slide 2](docs/slide2.png)
+![Slide 3](docs/slide3.png)
+![Slide 4](docs/slide4.png)
+![Slide 5](docs/slide5.png)
+![Slide 6](docs/slide6.png)
 
 
