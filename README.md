@@ -1,56 +1,61 @@
 # AWS Proactive Monitoring & Incident Alerting (CloudWatch + SNS)
 
-Implementação prática de uma esteira de observabilidade, resposta automatizada a incidentes e governança de custos na AWS, seguindo os pilares de **Excelência Operacional** e **Otimização de Custos** do AWS Well-Architected Framework.
+Implementação prática de uma esteira de observabilidade, governança financeira e resposta automatizada a incidentes na AWS, estruturada sob os pilares de **Excelência Operacional** e **Otimização de Custos** do *AWS Well-Architected Framework*.
 
 ---
 
-## 📑 Apresentação Visual do Projeto
+## 🏛️ Visão Geral da Arquitetura
 
-Confira abaixo o fluxo completo da arquitetura e as evidências técnicas de execução:
-(<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0001" src="https://github.com/user-attachments/assets/5dd8de4e-6ba5-4c78-a566-7081f7425a9d" />)
+A solução implementa um fluxo desacoplado de telemetria e mensageria para detecção precoce de anomalias computacionais e controle orçamentário:
 
+```text
+[ Amazon EC2 ]  ──(Métricas de CPU & Status)──>  [ Amazon CloudWatch ]  ──(Gatilho ALARM)──>  [ Amazon SNS ]  ──>  [ Notificação por E-mail ]
+[ AWS Billing ] ──(Estimated Charges)────────>  [ Amazon CloudWatch ]  ──(Gatilho ALARM)──>  [ Amazon SNS ]  ──>  [ Notificação por E-mail ]
+```
 
-![Slide 2 - Governança CloudWatch](docs/slide2.png)
-<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0002" src="https://github.com/user-attachments/assets/781f8698-2f02-4115-aa67-a129e67bab3e" />
-
-![Slide 3 - Desacoplamento SNS](docs/slide3.png)
-<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0003" src="https://github.com/user-attachments/assets/9bdc21aa-7e84-4678-bf30-04623da4e54e" />
-
-![Slide 4 - Teste de Carga Linux](docs/slide4.png)
-<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0004" src="https://github.com/user-attachments/assets/1d3d4a2e-5315-49aa-a56d-21340bdb8d79" />
-
-![Slide 5 - Comportamento da Métrica](docs/slide5.png)
-<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0005" src="https://github.com/user-attachments/assets/4fb185e2-e871-4b29-8eaf-1c93b26d7f53" />
-
-![Slide 6 - Notificação Recebida](docs/slide6.png)
-<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0006" src="https://github.com/user-attachments/assets/00d04358-fccd-4e69-86e8-382e34214bf3" />
-
-
-> 📄 **Documento Completo:** [Baixar apresentação em PDF](./Cassiano%20Alarmes%20e%20Notificacoes%20AWS%20CW%20ofc.pdf)
+* **Telemetria de Baixo Acoplamento:** As regras de monitoramento operam no CloudWatch de forma isolada das instâncias, sem a necessidade de agentes pesados para métricas padrão do hypervisor.
+* **Mensageria Assíncrona (Pub/Sub):** O Amazon SNS atua como intermediário, permitindo plugar futuros canais (Slack, PagerDuty, AWS Lambda para auto-remediação) sem reconfigurar os alarmes.
+* **FinOps Preventivo:** Monitoramento ativo da métrica `EstimatedCharges` em moeda local (USD), evitando cobranças surpresa por recursos não desprovisionados.
 
 ---
 
-## 🏛️ Arquitetura da Solução
+## 📑 Etapas da Implementação & Evidências Técnicas
 
-* **Camada de Computação:** Instância Amazon EC2 rodando Amazon Linux 2023.
-* **Camada de Telemetria:** Métricas operacionais e de integridade coletadas via Amazon CloudWatch.
-* **Camada de Notificação:** Arquitetura desacoplada via Pub/Sub utilizando Amazon SNS com endpoint de e-mail verificado.
-* **Governança Orçamentária (FinOps):** Alarme de faturamento preventivo (*Estimated Charges*).
+### 1. Governança e Inicialização do Ambiente
+Criação do escopo do projeto, garantindo o alinhamento das configurações com as metas de monitoramento contínuo.
+
+<img width="3000" height="1688" alt="Slide 1 - Capa" src="https://github.com/user-attachments/assets/5dd8de4e-6ba5-4c78-a566-7081f7425a9d" />
 
 ---
 
-## 🎯 Componentes Implementados
+### 2. Painel de Alarmes e Camadas de Observabilidade
+Definição dos limiares operacionais no Amazon CloudWatch divididos em três vetores estratégicos:
+* **Integridade de Infraestrutura (`StatusCheckFailed`):** Monitora falhas no hardware do host da AWS e no sistema operacional da EC2.
+* **Performance Computacional (`CPUUtilization`):** Monitoramento contínuo com limiar estático para contenção de sobrecarga.
+* **Governança Financeira (`EstimatedCharges`):** Alarme acionado caso os custos estimados ultrapassem **$5 USD** em uma janela de 6 horas.
 
-### 1. Amazon CloudWatch Alarms
-* `EC2-Alta-Utilizacao-CPU`: Limiar estático acionado quando `CPUUtilization >= 50%` por 1 período de 60 segundos.
-* `EC2-StatusCheckFailed`: Monitoramento contínuo de falhas no hypervisor/hardware da instância.
-* `Alarme-Gasto-Maior-$5`: Alarme orçamentário para controle preventivo contra custos residuais.
+<img width="3000" height="1688" alt="Slide 2 - Governança CloudWatch" src="https://github.com/user-attachments/assets/781f8698-2f02-4115-aa67-a129e67bab3e" />
 
-### 2. Amazon SNS (Simple Notification Service)
-* Tópico `alerta-alta-cpu-servidores` gerenciando subscrição e entrega de mensagens em tempo real via protocolo EMAIL.
+---
 
-### 3. Engenharia de Confiabilidade (Teste Sintético)
-* Simulação de sobrecarga de processador utilizando o utilitário `stress` via terminal Linux:
+### 3. Desacoplamento de Alertas com Amazon SNS
+Configuração do tópico centralizador `alerta-alta-cpu-servidores` utilizando o modelo Publish/Subscribe:
+* **Protocolo:** Email.
+* **Confirmação de Inscrição:** Assinatura autenticada com status `Confirmed`, garantindo que o canal de entrega seja válido e responsivo antes da ativação dos disparos.
+
+<img width="3000" height="1688" alt="Slide 3 - Desacoplamento SNS" src="https://github.com/user-attachments/assets/9bdc21aa-7e84-4678-bf30-04623da4e54e" />
+
+---
+
+### 4. Engenharia de Confiabilidade: Teste de Carga Sintética
+Validação prática do alarme forçando uma anomalia em ambiente controlado. Acessou-se a instância EC2 via terminal SSH (Amazon Linux 2023) executando o utilitário `stress`:
+
 ```bash
+# Atualização de pacotes e instalação do utilitário de benchmark
 sudo dnf install stress -y
+
+# Alocação de 100% de 1 núcleo de CPU por 300 segundos (5 minutos)
 stress --cpu 1 --timeout 300
+```
+
+
