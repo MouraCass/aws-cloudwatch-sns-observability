@@ -7,7 +7,7 @@ Implementação prática de uma esteira de observabilidade, resposta automatizad
 ## 📑 Apresentação Visual do Projeto
 
 Confira abaixo o fluxo completo da arquitetura e as evidências técnicas de execução:
-![Slide 1 - Capa](<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0001" src="https://github.com/user-attachments/assets/5dd8de4e-6ba5-4c78-a566-7081f7425a9d" />)
+(<img width="3000" height="1688" alt="Cassiano Alarmes e Notificacoes AWS CW_page-0001" src="https://github.com/user-attachments/assets/5dd8de4e-6ba5-4c78-a566-7081f7425a9d" />)
 
 
 ![Slide 2 - Governança CloudWatch](docs/slide2.png)
