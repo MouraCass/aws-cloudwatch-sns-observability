@@ -29,3 +29,15 @@ Implementação prática de um pipeline de observabilidade, governança de custo
    ```bash
    sudo dnf install stress -y
    stress --cpu 1 --timeout 300
+
+
+📊 Evidências de Execução
+Simulação de Carga: Instalação e execução do stress na instância EC2.
+
+Violação de Limiar: Gráfico do CloudWatch registrando pico de 88% de CPU rompendo a linha de base.
+
+Entrega de Incidente: Notificação oficial recebida via e-mail com metadados detalhados de diagnóstico.
+
+[Cassiano Alarmes e Notificacoes AWS CW.pdf](https://github.com/user-attachments/files/32162857/Cassiano.Alarmes.e.Notificacoes.AWS.CW.pdf)
+
+
